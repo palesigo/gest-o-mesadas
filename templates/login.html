@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gestão de Mesadas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c62828;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .hint {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .hint strong {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <h1>💰 Mesadas</h1>
+            <p>Gestão Familiar de Mesadas</p>
+        </div>
+
+        {% if error %}
+        <div class="error-message">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Utilizador</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Introduz o teu utilizador"
+                    autofocus
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Introduz a tua password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="login-button">Entrar</button>
+        </form>
+
+<!--                <div style="text-align: center; margin-top: 15px;">
+            <button 
+                type="button" 
+                onclick="showPasswordResetRequest()" 
+                style="background: none; border: none; color: #667eea; cursor: pointer; font-size: 13px; text-decoration: underline;">
+                Esqueci-me da password
+            </button>
+        </div>
+    </div>
+
+    <div id="passwordResetModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Recuperar Password</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                Introduz o teu utilizador. Se tiveres email registado, receberás instruções.
+            </p>
+            <div class="form-group">
+                <label for="resetUsername">Utilizador:</label>
+                <input type="text" id="resetUsername" placeholder="O teu utilizador">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeResetModal()">Cancelar</button>
+                <button class="modal-btn modal-btn-ok" onclick="requestPasswordReset()">Enviar Instruções</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPasswordResetRequest() {
+            document.getElementById('passwordResetModal').style.display = 'block';
+            document.getElementById('resetUsername').value = '';
+            document.getElementById('resetUsername').focus();
+        }
+
+        function closeResetModal() {
+            document.getElementById('passwordResetModal').style.display = 'none';
+        }
+
+        async function requestPasswordReset() {
+            const username = document.getElementById('resetUsername').value.trim();
+            if (!username) {
+                alert('Por favor, introduz o teu utilizador!');
+                return;
+            }
+
+            const resp = await fetch('/api/users/request-password-reset', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username })
+            });
+
+            const data = await resp.json();
+            alert(data.message);
+            if (data.email_sent || !data.no_email) {
+                closeResetModal();
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordResetModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+-->
+</body>
+</html>

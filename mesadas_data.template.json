@@ -1,0 +1,11 @@
+{
+  "children": {},
+  "users": {
+    "admin": {
+      "role": "gestor",
+      "password": "admin",
+      "email": null,
+      "child_name": null
+    }
+  }
+}

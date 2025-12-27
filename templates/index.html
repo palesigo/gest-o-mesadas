@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Mesadas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            min-height: 90vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h1 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+        }
+
+        .user-info strong {
+            color: #333;
+        }
+
+        .child-selector {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .child-selector label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .child-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .child-selector select:hover,
+        .child-selector select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .separator {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: left;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-manage { background: #9C27B0; }
+        .btn-manage:hover { background: #7B1FA2; }
+
+        .btn-edit { background: #2196F3; }
+        .btn-edit:hover { background: #0b7dda; }
+
+        .btn-spend { background: #FF9800; }
+        .btn-spend:hover { background: #e68900; }
+
+        .btn-pay { background: #4CAF50; }
+        .btn-pay:hover { background: #45a049; }
+
+        .btn-transactions { background: #00BCD4; }
+        .btn-transactions:hover { background: #00ACC1; }
+
+        .btn-reset { background: #FF5722; }
+        .btn-reset:hover { background: #E64A19; }
+
+        .btn-logout { 
+            background: #757575;
+            margin-top: auto;
+        }
+        .btn-logout:hover { background: #616161; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+        }
+
+        .child-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .cofres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cofre-card {
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .cofre-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .cofre-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cofre-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .total-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border-radius: 12px;
+            padding: 30px;
+            color: white;
+        }
+
+        .total-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .debt-card {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A5A 100%);
+        }
+
+        .card-label {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 40px;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .info-box p {
+            color: #E65100;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* TRANSACTIONS TABLE */
+        .transactions-container {
+            margin-top: 30px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .transactions-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .transactions-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .transactions-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .type-credit {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .type-debit {
+            color: #f44336;
+            font-weight: 600;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 40px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-ok {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn-ok:hover {
+            background: #764ba2;
+        }
+
+        .modal-btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .cofres-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .total-section {
+                grid-template-columns: 1fr;
+            }
+
+            .child-name {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h1>💰 Mesadas</h1>
+            
+            <div class="user-info" id="userInfo">
+                <p><strong>Utilizador:</strong> <span id="usernameDisplay">-</span></p>
+                <p><strong>Perfil:</strong> <span id="roleDisplay">-</span></p>
+            </div>
+
+            <div class="child-selector" id="childSelectorDiv">
+                <label for="childSelect">Criança:</label>
+                <select id="childSelect" onchange="selectChild()">
+                    <option>Nenhuma criança</option>
+                </select>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="menu-buttons">
+                <button class="btn btn-manage" id="btnManage" onclick="showManageUserModal()">👤 Gerir Utilizador</button>
+                <button class="btn btn-edit" id="btnEdit" onclick="showEditAllowanceModal()">✏️ Alterar Valores</button>
+                <button class="btn btn-spend" id="btnSpend" onclick="showSpendModal()">💸 Registar Gasto</button>
+                <button class="btn btn-pay" id="btnPay" onclick="confirmPayment()">✅ Confirmar Pagamento</button>
+                <button class="btn btn-transactions" id="btnTransactions" onclick="showTransactions()">📋 Movimentos</button>
+                <button class="btn btn-reset" id="btnResetPwd" onclick="showResetPasswordModal()">🔑 Repor Password</button>
+                <button class="btn btn-logout" onclick="logout()">🚪 Sair</button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content" id="mainContent">
+            <div class="empty-state">
+                <h2>👋 A carregar...</h2>
+                <p>Por favor aguarda</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="manageUserModal" class="modal">
+        <div class="modal-content">
+            <h2>Gerir Utilizador</h2>
+            <div class="form-group">
+                <label for="actionSelect">Ação:</label>
+                <select id="actionSelect" onchange="updateManageUserLabel()">
+                    <option value="add">Adicionar</option>
+                    <option value="remove">Remover</option>
+                </select>
+            </div>
+
+            <!-- Campos para ADICIONAR -->
+            <div id="addUserFields" style="display: block;">
+                <div class="form-group">
+                    <label for="userProfileSelect">Perfil:</label>
+                    <select id="userProfileSelect">
+                        <option value="crianca">Criança</option>
+                        <option value="gestor">Gestor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userNameAdd">Nome (para crianças):</label>
+                    <input type="text" id="userNameAdd" placeholder="Nome da criança (obrigatório para crianças)">
+                </div>
+                <div class="form-group">
+                    <label for="usernameAdd">Utilizador:</label>
+                    <input type="text" id="usernameAdd" placeholder="Nome de utilizador único">
+                </div>
+                <div class="form-group">
+                    <label for="passwordAdd">Password:</label>
+                    <input type="password" id="passwordAdd" placeholder="Password para a conta">
+                </div>
+                <div class="form-group">
+                    <label for="emailAdd">Email (opcional):</label>
+                    <input type="email" id="emailAdd" placeholder="Email para recuperação de password">
+                </div>
+            </div>
+
+            <!-- Campos para REMOVER -->
+            <div id="removeUserFields" style="display: none;">
+                <div class="form-group">
+                    <label for="usernameRemove">Utilizador a remover:</label>
+                    <input type="text" id="usernameRemove" placeholder="Nome de utilizador">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('manageUserModal')">Cancelar</button>
+                <button class="modal-btn modal-btn-ok" onclick="manageUser()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editAllowanceModal" class="modal">
+        <div class="modal-content">
+            <h2>Alterar Valores de Mesada</h2>
+            <div id="allowanceFields"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('editAllowanceModal')">Cancelar</button>
+                <button class="modal-btn modal-btn-ok" onclick="updateAllowance()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="spendModal" class="modal">
+        <div class="modal-content">
+            <h2>Registar Gasto</h2>
+            <div class="form-group">
+                <label for="spendCofre">Cofre:</label>
+                <select id="spendCofre"></select>
+            </div>
+            <div class="form-group">
+                <label for="spendValue">Valor (€):</label>
+                <input type="number" id="spendValue" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label for="spendDescription">Descrição:</label>
+                <textarea id="spendDescription" placeholder="Descrição do gasto (opcional)"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('spendModal')">Cancelar</button>
+                <button class="modal-btn modal-btn-ok" onclick="registerSpend()">Registar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <h2>Repor Password</h2>
+            <div class="form-group">
+                <label for="resetUsername">Utilizador:</label>
+                <input type="text" id="resetUsername" placeholder="Username a atualizar">
+            </div>
+            <div class="form-group">
+                <label for="resetNewPassword">Nova Password:</label>
+                <input type="password" id="resetNewPassword" placeholder="Nova password">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal('resetPasswordModal')">Cancelar</button>
+                <button class="modal-btn modal-btn-ok" onclick="resetPassword()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentChild = null;
+        let currentView = 'summary';
+        let currentUser = null;
+
+        // ========== INICIALIZAÇÃO ==========
+        async function init() {
+            await fetchMe();
+            displayUserInfo();
+            setupSidebar();
+
+            if (currentUser.role === 'gestor') {
+                document.getElementById('childSelectorDiv').style.display = 'block';
+                await loadChildren();
+            } else if (currentUser.role === 'crianca') {
+                document.getElementById('childSelectorDiv').style.display = 'none';
+                currentChild = currentUser.child_name;
+                // Esconder botões que não se aplicam a crianças
+                document.getElementById('btnManage').style.display = 'none';
+                document.getElementById('btnEdit').style.display = 'none';
+                document.getElementById('btnSpend').style.display = 'none';
+                document.getElementById('btnPay').style.display = 'none';
+                document.getElementById('btnResetPwd').style.display = 'none';
+            }
+
+            refreshDisplay();
+        }
+
+        async function fetchMe() {
+            const resp = await fetch('/api/me');
+            if (!resp.ok) {
+                window.location.href = '/login';
+                return;
+            }
+            currentUser = await resp.json();
+        }
+
+        function displayUserInfo() {
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            document.getElementById('roleDisplay').textContent = 
+                currentUser.role === 'gestor' ? 'Gestor' : 'Criança';
+        }
+
+        function setupSidebar() {
+            // Sidebar já tem os botões; vão ficar visíveis ou não conforme o role
+        }
+
+        // ========== CRIANÇAS ==========
+        async function loadChildren() {
+            const response = await fetch(`${API_BASE}/children`);
+            const data = await response.json();
+            const select = document.getElementById('childSelect');
+            
+            select.innerHTML = '<option>Nenhuma criança</option>';
+            data.children.forEach(child => {
+                const option = document.createElement('option');
+                option.value = child;
+                option.textContent = child;
+                select.appendChild(option);
+            });
+
+            if (data.children.length > 0) {
+                select.value = data.children[0];
+                currentChild = data.children[0];
+            }
+        }
+
+        async function selectChild() {
+            const select = document.getElementById('childSelect');
+            currentChild = select.value === 'Nenhuma criança' ? null : select.value;
+            currentView = 'summary';
+            refreshDisplay();
+        }
+
+        // ========== DISPLAY ==========
+        async function refreshDisplay() {
+            if (currentView === 'summary') {
+                showSummary();
+            } else if (currentView === 'transactions') {
+                showTransactions();
+            }
+        }
+
+        async function showSummary() {
+            const mainContent = document.getElementById('mainContent');
+            currentView = 'summary';
+
+            if (!currentChild) {
+                mainContent.innerHTML = `
+                    <div class="empty-state">
+                        <h2>👋 Bem-vindo!</h2>
+                        <p>Seleciona uma criança no menu ao lado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/child/${currentChild}`);
+            if (!response.ok) return;
+
+            const child = await response.json();
+            const lastPaid = new Date(child.last_paid);
+
+            const total = Object.values(child.cofres).reduce((a, b) => a + b, 0);
+
+            let cofresHTML = '';
+            for (const [cofre, valor] of Object.entries(child.cofres)) {
+                cofresHTML += `
+                    <div class="cofre-card">
+                        <div class="cofre-name">${cofre}</div>
+                        <div class="cofre-value">${valor.toFixed(2)}€</div>
+                    </div>
+                `;
+            }
+
+            let paymentHistoryHTML = '';
+            if (child.last_payment_date) {
+                const lastPaymentDate = new Date(child.last_payment_date);
+                paymentHistoryHTML = `<p>📅 Último pagamento: ${lastPaymentDate.toLocaleDateString('pt-PT')}</p>`;
+            }
+
+            mainContent.innerHTML = `
+                <div class="child-name">👤 ${currentChild}</div>
+                
+                <div class="total-section">
+                    <div class="card total-card">
+                        <div class="card-label">Total Acumulado</div>
+                        <div class="card-value">${total.toFixed(2)}€</div>
+                    </div>
+                    <div class="card debt-card">
+                        <div class="card-label">Em Falta Pagar</div>
+                        <div class="card-value">${child.debt.toFixed(2)}€</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 20px; color: #333;">Cofres</h3>
+                <div class="cofres-grid">
+                    ${cofresHTML}
+                </div>
+
+                <div class="info-box">
+                    <p>📅 Próximo pagamento: ${lastPaid.toLocaleDateString('pt-PT')} (sábado)</p>
+                    ${paymentHistoryHTML}
+                </div>
+            `;
+        }
+
+        async function showTransactions() {
+            const mainContent = document.getElementById('mainContent');
+            currentView = 'transactions';
+
+            if (!currentChild) {
+                alert('Seleciona uma criança primeiro!');
+                currentView = 'summary';
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/child/${currentChild}/transactions`);
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const transactions = data.transactions || [];
+
+            let tableHTML = '';
+            if (transactions.length === 0) {
+                tableHTML = '<p style="text-align: center; color: #999; padding: 40px;">Nenhum movimento registado</p>';
+            } else {
+                tableHTML = `
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Cofre</th>
+                                <th>Descrição</th>
+                                <th>Montante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                transactions.forEach(t => {
+                    const date = new Date(t.date);
+                    const typeClass = t.type === 'Crédito' ? 'type-credit' : 'type-debit';
+                    tableHTML += `
+                        <tr>
+                            <td>${date.toLocaleDateString('pt-PT')} ${date.toLocaleTimeString('pt-PT')}</td>
+                            <td class="${typeClass}">${t.type}</td>
+                            <td>${t.cofre}</td>
+                            <td>${t.description}</td>
+                            <td>${t.amount.toFixed(2)}€</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            mainContent.innerHTML = `
+                <div class="child-name">👤 ${currentChild} - Movimentos</div>
+                <button class="btn btn-edit" onclick="showSummary()" style="margin-bottom: 20px; display: inline-block;">← Voltar ao Resumo</button>
+                <div class="transactions-container">
+                    ${tableHTML}
+                </div>
+            `;
+        }
+
+        // ========== MODAIS ==========
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // ========== GERIR UTILIZADOR ==========
+        function showManageUserModal() {
+            if (currentUser.role !== 'gestor') {
+                alert('Esta ação só está disponível para gestores.');
+                return;
+            }
+            document.getElementById('actionSelect').value = 'add';
+            updateManageUserLabel();
+            openModal('manageUserModal');
+        }
+
+        function updateManageUserLabel() {
+            const action = document.getElementById('actionSelect').value;
+            const addFields = document.getElementById('addUserFields');
+            const removeFields = document.getElementById('removeUserFields');
+
+            if (action === 'add') {
+                addFields.style.display = 'block';
+                removeFields.style.display = 'none';
+                // Limpar campos
+                document.getElementById('userNameAdd').value = '';
+                document.getElementById('usernameAdd').value = '';
+                document.getElementById('passwordAdd').value = '';
+                document.getElementById('emailAdd').value = '';
+                document.getElementById('userProfileSelect').value = 'crianca';
+            } else if (action === 'remove') {
+                addFields.style.display = 'none';
+                removeFields.style.display = 'block';
+                document.getElementById('usernameRemove').value = '';
+            }
+        }
+
+        async function manageUser() {
+            const action = document.getElementById('actionSelect').value;
+
+            if (action === 'add') {
+                await addNewUser();
+            } else if (action === 'remove') {
+                await removeUser();
+            }
+        }
+
+        async function addNewUser() {
+            const profile = document.getElementById('userProfileSelect').value;
+            const name = document.getElementById('userNameAdd').value.trim();
+            const username = document.getElementById('usernameAdd').value.trim();
+            const password = document.getElementById('passwordAdd').value.trim();
+            const email = document.getElementById('emailAdd').value.trim();
+
+            // Validações
+            if (!username || !password) {
+                alert('Utilizador e password são obrigatórios!');
+                return;
+            }
+            if (profile === 'crianca' && !name) {
+                alert('O nome é obrigatório para crianças!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/child/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: profile === 'crianca' ? name : username,
+                        role: profile,
+                        username: username,
+                        password: password,
+                        email: email
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Utilizador '${username}' adicionado com sucesso!`);
+                    closeModal('manageUserModal');
+                    if (profile === 'crianca') {
+                        await loadChildren();
+                    }
+                    refreshDisplay();
+                } else {
+                    alert('Erro: ' + (data.error || 'Não foi possível adicionar'));
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao executar a ação');
+            }
+        }
+
+        async function removeUser() {
+            const username = document.getElementById('usernameRemove').value.trim();
+
+            if (!username) {
+                alert('Por favor, introduz o utilizador a remover!');
+                return;
+            }
+
+            if (confirm(`Tem a certeza que deseja remover o utilizador '${username}'?`)) {
+                try {
+                    const response = await fetch(`${API_BASE}/child/remove`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: username })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(`Utilizador '${username}' removido com sucesso!`);
+                        closeModal('manageUserModal');
+                        await loadChildren();
+                        currentChild = null;
+                        refreshDisplay();
+                    } else {
+                        alert('Erro: ' + (data.error || 'Não foi possível remover'));
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao executar a ação');
+                }
+            }
+        }
+
+        // ========== EDITAR MESADA ==========
+        function showEditAllowanceModal() {
+            if (currentUser.role !== 'gestor') {
+                alert('Esta ação só está disponível para gestores.');
+                return;
+            }
+            if (!currentChild) {
+                alert('Seleciona uma criança primeiro!');
+                return;
+            }
+
+            fetch(`${API_BASE}/child/${currentChild}`)
+                .then(r => r.json())
+                .then(child => {
+                    let fieldsHTML = '';
+                    for (const [cofre, valor] of Object.entries(child.allowance)) {
+                        fieldsHTML += `
+                            <div class="form-group">
+                                <label>${cofre}:</label>
+                                <input type="number" id="allowance_${cofre}" value="${valor}" step="0.01" min="0">
+                            </div>
+                        `;
+                    }
+                    document.getElementById('allowanceFields').innerHTML = fieldsHTML;
+                    openModal('editAllowanceModal');
+                });
+        }
+
+        async function updateAllowance() {
+            if (!currentChild) return;
+
+            const response = await fetch(`${API_BASE}/child/${currentChild}`);
+            const child = await response.json();
+            
+            const newAllowance = {};
+            for (const cofre of Object.keys(child.allowance)) {
+                newAllowance[cofre] = parseFloat(document.getElementById(`allowance_${cofre}`).value);
+            }
+
+            const updateResponse = await fetch(`${API_BASE}/child/update-allowance`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: currentChild, allowance: newAllowance })
+            });
+
+            const data = await updateResponse.json();
+            if (data.success) {
+                alert('Valores alterados com sucesso!');
+                closeModal('editAllowanceModal');
+                refreshDisplay();
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        }
+
+        // ========== REGISTAR GASTO ==========
+        function showSpendModal() {
+            if (currentUser.role !== 'gestor') {
+                alert('Esta ação só está disponível para gestores.');
+                return;
+            }
+            if (!currentChild) {
+                alert('Seleciona uma criança primeiro!');
+                return;
+            }
+
+            fetch(`${API_BASE}/child/${currentChild}`)
+                .then(r => r.json())
+                .then(child => {
+                    const select = document.getElementById('spendCofre');
+                    select.innerHTML = '';
+                    for (const cofre of Object.keys(child.cofres)) {
+                        const option = document.createElement('option');
+                        option.value = cofre;
+                        option.textContent = cofre;
+                        select.appendChild(option);
+                    }
+                    document.getElementById('spendDescription').value = '';
+                    openModal('spendModal');
+                });
+        }
+
+        async function registerSpend() {
+            if (!currentChild) return;
+
+            const cofre = document.getElementById('spendCofre').value;
+            const valor = parseFloat(document.getElementById('spendValue').value);
+            const descricao = document.getElementById('spendDescription').value.trim();
+
+            if (!valor || valor <= 0) {
+                alert('Introduz um valor válido!');
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/child/spend`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: currentChild, cofre, valor, descricao })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Gasto registado com sucesso!');
+                closeModal('spendModal');
+                document.getElementById('spendValue').value = '';
+                document.getElementById('spendDescription').value = '';
+                refreshDisplay();
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        }
+
+        // ========== CONFIRMAR PAGAMENTO ==========
+        async function confirmPayment() {
+            if (currentUser.role !== 'gestor') {
+                alert('Esta ação só está disponível para gestores.');
+                return;
+            }
+            if (!currentChild) {
+                alert('Seleciona uma criança primeiro!');
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/child/pay`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: currentChild })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Mesada paga com sucesso! Data avançada uma semana.');
+                refreshDisplay();
+            } else {
+                alert(data.error || 'Erro ao confirmar pagamento');
+            }
+        }
+
+        // ========== REPOR PASSWORD ==========
+        function showResetPasswordModal() {
+            if (currentUser.role !== 'gestor') {
+                alert('Esta ação só está disponível para gestores.');
+                return;
+            }
+            document.getElementById('resetUsername').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            openModal('resetPasswordModal');
+        }
+
+        async function resetPassword() {
+            const username = document.getElementById('resetUsername').value.trim();
+            const newPassword = document.getElementById('resetNewPassword').value.trim();
+
+            if (!username || !newPassword) {
+                alert('Preenche utilizador e nova password.');
+                return;
+            }
+
+            const resp = await fetch('/api/users/reset-password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, new_password: newPassword })
+            });
+
+            const data = await resp.json();
+            if (data.success) {
+                alert('Password reposta com sucesso.');
+                closeModal('resetPasswordModal');
+            } else {
+                alert('Erro: ' + (data.error || 'não foi possível repor a password'));
+            }
+        }
+
+        // ========== LOGOUT ==========
+        function logout() {
+            if (confirm('Tem a certeza que deseja sair?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        // Inicializa a aplicação
+        init();
+    </script>
+</body>
+</html>

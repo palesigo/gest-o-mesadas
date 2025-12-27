@@ -1,0 +1,26 @@
+# Dados privados
+mesadas_data.json
+mesadas_data.backup.json
+
+# Configurações sensíveis
+.env
+config_local.py
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.spec
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
