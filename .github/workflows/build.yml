@@ -30,12 +30,16 @@ jobs:
       - name: Build with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller --onefile --windowed --add-data "templates:templates" Gestao_mesada.py
+          pyinstaller --onefile --windowed ^
+          --hidden-import flask ^
+          --add-data "templates:templates" Gestao_mesada.py
 
       - name: Build with PyInstaller (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --windowed --add-data "templates;templates" Gestao_mesada.py
+          pyinstaller --onefile --windowed ^
+          --hidden-import flask ^
+          --add-data "templates;templates" Gestao_mesada.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
